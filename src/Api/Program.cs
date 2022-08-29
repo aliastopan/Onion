@@ -1,4 +1,6 @@
 using System.Reflection;
+using Onion.Application;
+using Onion.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,8 +16,10 @@ builder.Host.ConfigureLogging((context, logging) =>
     logging.AddSerilog();
 });
 
-builder.Host.ConfigureServices((_, services) =>
+builder.Host.ConfigureServices((context, services) =>
 {
+    services.AddApplicationServices();
+    services.AddInfrastructureServices(context.Configuration);
     services.AddRouteEndpoints(Assembly.GetExecutingAssembly());
 });
 
