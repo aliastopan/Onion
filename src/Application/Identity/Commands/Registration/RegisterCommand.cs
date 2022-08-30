@@ -1,14 +1,19 @@
+using Onion.Application.Common.Validations;
+
 namespace Onion.Application.Identity.Commands.Registration;
 
 public record RegisterCommand : IRequest<Result<RegisterCommandResponse>>
 {
     [Required]
+    [RegularExpression(RegexPattern.Username)]
     public string Username { get; init; }
 
     [Required]
+    [EmailAddress]
     public string Email { get; init; }
 
     [Required]
+    [RegularExpression(RegexPattern.StrongPassword)]
     public string Password { get; init; }
 
     public RegisterCommand(string username, string email, string password)
