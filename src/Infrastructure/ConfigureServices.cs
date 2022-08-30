@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Onion.Application.Common.Interfaces;
 using Onion.Infrastructure.Extensions;
 using Onion.Infrastructure.Persistence;
+using Onion.Infrastructure.Services;
 
 namespace Onion.Infrastructure;
 
@@ -12,6 +13,7 @@ public static class ConfigureServices
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services,
         IConfiguration configuration)
     {
+        services.AddSingleton<ISecureHash, SecureHashProvider>();
         services.AddInfrastructureDbContext(configuration);
         return services;
     }
