@@ -1,10 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
-using Onion.Application.Common.Interfaces;
-using Onion.Infrastructure.Extensions;
-using Onion.Infrastructure.Persistence;
-using Onion.Infrastructure.Services;
 
 namespace Onion.Infrastructure;
 
