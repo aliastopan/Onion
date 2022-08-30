@@ -4,6 +4,17 @@ namespace Onion.Domain.Entities.Identity;
 
 public class User
 {
+    public User(string username, string email, string hashedPassword, string salt)
+    {
+        Id = Guid.NewGuid();
+        Username = username;
+        Email = email;
+        Role = UserRole.Standard;
+        IsVerified = false;
+        HashedPassword = hashedPassword;
+        Salt = salt;
+    }
+
     public Guid Id { get; set; }
     public string Username { get; set; } = null!;
     public string Email { get; set; } = null!;
