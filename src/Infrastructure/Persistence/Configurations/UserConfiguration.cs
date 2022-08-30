@@ -27,7 +27,6 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(x => x.Role)
                .HasColumnName("role")
-               .HasMaxLength(16)
                .IsRequired();
 
         builder.Property(x => x.IsVerified)
