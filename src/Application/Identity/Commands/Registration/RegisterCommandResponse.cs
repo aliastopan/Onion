@@ -1,6 +1,5 @@
+using Onion.Domain.Entities.Identity;
+
 namespace Onion.Application.Identity.Commands.Registration;
 
-public record RegisterCommandResponse(
-    Guid UserId,
-    string Username,
-    DateTimeOffset CreationDate);
+public record RegisterCommandResponse(User User);
