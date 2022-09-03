@@ -30,7 +30,8 @@ public class RegisterCommandHandler
         var validation = ValidateEntry(request.Username, request.Email);
         if(!validation.IsSuccess)
         {
-            result = Result<RegisterCommandResponse>.Conflict(validation.Errors.ToArray());
+            errors = validation.Errors.ToArray();
+            result = Result<RegisterCommandResponse>.Conflict(errors);
             return Task.FromResult(result);
         }
 
@@ -45,13 +46,13 @@ public class RegisterCommandHandler
         User user = _dbContext.Users.Search(username)!;
         if(user is not null)
         {
-            return Result.Conflict();
+            return Result.Conflict(Error.Registration.UsernameTaken);
         }
 
         user = _dbContext.Users.SearchByEmail(email)!;
         if(user is not null)
         {
-            return Result.Conflict();
+            return Result.Conflict(Error.Registration.EmailInUse);
         }
 
         return Result.Ok();
