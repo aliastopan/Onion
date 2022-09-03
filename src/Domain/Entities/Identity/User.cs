@@ -13,6 +13,8 @@ public class User
         IsVerified = false;
         HashedPassword = hashedPassword;
         Salt = salt;
+        CreationDate = DateTimeOffset.Now;
+        LastLoggedIn = DateTimeOffset.Now;
     }
 
     public Guid Id { get; set; }
@@ -22,4 +24,6 @@ public class User
     public bool IsVerified { get; set; }
     public string HashedPassword { get; set; } = null!;
     public string Salt { get; set; } = null!;
+    public DateTimeOffset CreationDate { get; set; }
+    public DateTimeOffset LastLoggedIn { get; set; }
 }

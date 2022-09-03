@@ -36,7 +36,7 @@ public class RegisterCommandHandler
         }
 
         var user = CreateUser(request.Username, request.Email, request.Password);
-        var response = new RegisterCommandResponse(user.Id, user.Username);
+        var response = new RegisterCommandResponse(user.Id, user.Username, user.CreationDate);
         result = Result<RegisterCommandResponse>.Ok(response);
         return Task.FromResult(result);
     }

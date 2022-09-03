@@ -2,4 +2,5 @@ namespace Onion.Application.Identity.Commands.Registration;
 
 public record RegisterCommandResponse(
     Guid UserId,
-    string Username);
+    string Username,
+    DateTimeOffset CreationDate);

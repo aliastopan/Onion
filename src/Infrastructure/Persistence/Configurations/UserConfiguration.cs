@@ -43,5 +43,13 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
                .HasColumnName("salt")
                .HasMaxLength(8)
                .IsRequired();
+
+       builder.Property(x => x.CreationDate)
+              .HasColumnName("creation_date")
+              .IsRequired();
+
+       builder.Property(x => x.LastLoggedIn)
+              .HasColumnName("last_logged_in")
+              .IsRequired();
     }
 }
