@@ -25,6 +25,7 @@ public class AuthenticationEndpoint : IRouteEndpoint
                     Expires = DateTime.Now.AddMonths(1)
                 };
                 httpContext.Response.Cookies.Append("jwt", value.Jwt, cookieOption);
+                httpContext.Response.Cookies.Append("rwt", value.RefreshToken, cookieOption);
                 return Results.Ok(value);
             },
             error => error.AsProblem(new ProblemDetails

@@ -48,7 +48,8 @@ public class LoginCommandHandler
         _dbContext.Commit();
 
         var jwt = _jwtService.GenerateJwt(user);
-        var response = new LoginResponse(user, jwt);
+        var refreshToken = _jwtService.GenerateRefreshToken(jwt, user);
+        var response = new LoginResponse(user, jwt, refreshToken.Token);
         return Result<LoginResponse>.Ok(response);
     }
 
