@@ -2,7 +2,7 @@ using Onion.Application.Common.Validations;
 
 namespace Onion.Application.Identity.Commands.Registration;
 
-public record RegisterCommand : IRequest<Result<RegisterCommandResponse>>
+public record RegisterCommand : IRequest<Result<RegisterResponse>>
 {
     public RegisterCommand(string username, string email, string password)
     {

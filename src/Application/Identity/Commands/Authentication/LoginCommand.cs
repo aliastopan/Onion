@@ -1,6 +1,6 @@
 namespace Onion.Application.Identity.Commands.Authentication;
 
-public record LoginCommand : IRequest<Result<LoginCommandResponse>>
+public record LoginCommand : IRequest<Result<LoginResponse>>
 {
     public LoginCommand(string username, string password)
     {

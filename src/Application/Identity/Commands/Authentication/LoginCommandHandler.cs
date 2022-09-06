@@ -1,7 +1,7 @@
 namespace Onion.Application.Identity.Commands.Authentication;
 
 public class LoginCommandHandler
-    : IRequestHandler<LoginCommand, Result<LoginCommandResponse>>
+    : IRequestHandler<LoginCommand, Result<LoginResponse>>
 {
     private readonly IDbContext _dbContext;
     private readonly ISecureHash _secureHash;
@@ -17,30 +17,30 @@ public class LoginCommandHandler
         _jwtService = jwtService;
     }
 
-    public Task<Result<LoginCommandResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
+    public Task<Result<LoginResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
         var result = Login(request);
         return Task.FromResult(result);
     }
 
-    internal Result<LoginCommandResponse> Login(LoginCommand request)
+    internal Result<LoginResponse> Login(LoginCommand request)
     {
         var isValid = request.TryValidate(out var errors);
         if(!isValid)
         {
-            return Result<LoginCommandResponse>.Invalid(errors);
+            return Result<LoginResponse>.Invalid(errors);
         }
 
         var user = _dbContext.Users.Search(request.Username);
         if(user is null)
         {
-            return Result<LoginCommandResponse>.Unauthorized(Error.Authentication.UserNotRegistered);
+            return Result<LoginResponse>.Unauthorized(Error.Authentication.UserNotRegistered);
         }
 
         var validation = ValidatePassword(request.Password, user.Salt, user.HashedPassword);
         if(!validation.IsSuccess)
         {
-            return Result<LoginCommandResponse>.Inherit(result: validation);
+            return Result<LoginResponse>.Inherit(result: validation);
         }
 
         user.LastLoggedIn = DateTimeOffset.Now;
@@ -48,8 +48,8 @@ public class LoginCommandHandler
         _dbContext.Commit();
 
         var jwt = _jwtService.GenerateJwt(user);
-        var response = new LoginCommandResponse(user, jwt);
-        return Result<LoginCommandResponse>.Ok(response);
+        var response = new LoginResponse(user, jwt);
+        return Result<LoginResponse>.Ok(response);
     }
 
     private Result ValidatePassword(string password, string salt, string hashedPassword)
