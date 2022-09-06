@@ -1,6 +1,7 @@
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using AnnotatedResult;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Onion.Domain.Entities.Identity;
@@ -72,6 +73,60 @@ internal sealed class JwtProvider : IJwtService
         return refreshToken;
     }
 
+    public Result<(string jwt, string refreshToken)> Refresh(string jwt, string refreshToken)
+    {
+        var principal = GetPrincipalFromToken(jwt);
+        if(principal is null)
+        {
+            return Result<(string jwt, string refreshToken)>.Unauthorized();
+        }
+
+        var validation = ValidateToken(principal, refreshToken);
+        if(!validation.IsSuccess)
+        {
+            return Result<(string jwt, string refreshToken)>.Inherit(result: validation);
+        }
+
+        var refreshedToken = GenerateToken(principal);
+        return Result<(string jwt, string refreshToken)>.Ok(refreshedToken);
+    }
+
+    internal (string jwt, string refreshToken) GenerateToken(ClaimsPrincipal principal)
+    {
+        var jwt = GenerateJwt(principal, out var user);
+        var refreshToken = GenerateRefreshToken(jwt, user).Token;
+        return (jwt, refreshToken);
+    }
+
+    private Result ValidateToken(ClaimsPrincipal principal, string refreshToken)
+    {
+        var expiry = principal.Claims.Single(x => x.Type == JwtClaimTypes.Exp).Value;
+        var expiryDateUnix = long.Parse(expiry);
+        var expiryDateUtc = DateTime.UnixEpoch.AddSeconds(expiryDateUnix);
+        if(expiryDateUtc > DateTime.UtcNow)
+        {
+            return Result.Unauthorized();
+        }
+
+        var token = _dbContext.RefreshTokens.SingleOrDefault(x => x.Token == refreshToken);
+        if(token is null
+            || token.ExpiryDate > DateTime.UtcNow
+            || token.IsInvalidated
+            || token.IsUsed)
+        {
+            return Result.Unauthorized();
+        }
+
+        var jti = principal.Claims.Single(x => x.Type == JwtClaimTypes.Jti).Value;
+        if(token.JwtId != jti)
+        {
+            return Result.Unauthorized();
+        }
+
+        MarkRefreshTokenAsUsed(token);
+        return Result.Ok();
+    }
+
     private ClaimsPrincipal GetPrincipalFromToken(string jwt)
     {
         try
@@ -98,5 +153,12 @@ internal sealed class JwtProvider : IJwtService
         var jwtSecurityToken = securityToken as JwtSecurityToken;
         return jwtSecurityToken is not null && jwtSecurityToken!.Header.Alg
             .Equals(securityAlgorithm, StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    private void MarkRefreshTokenAsUsed(RefreshToken refreshToken)
+    {
+        refreshToken.IsUsed = true;
+        _dbContext.RefreshTokens.Update(refreshToken);
+        _dbContext.Commit();
     }
 }
