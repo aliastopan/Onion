@@ -13,6 +13,7 @@ internal sealed class JwtSettings
 
     public string Secret { get; init; } = null!;
     public TimeSpan TokenLifeTime { get; init; }
+    public TimeSpan RefreshLifeTime { get; init; }
     public string Issuer { get; init; } = null!;
     public string Audience { get; init; } = null!;
 }
