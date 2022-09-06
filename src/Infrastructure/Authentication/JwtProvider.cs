@@ -22,9 +22,10 @@ internal sealed class JwtProvider : IJwtService
         var signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha384);
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.UniqueName, user.Username),
+            new Claim(JwtClaimTypes.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtClaimTypes.Sub, user.Id.ToString()),
+            new Claim(JwtClaimTypes.UniqueName, user.Username),
+            new Claim(JwtClaimTypes.Role, user.Role.ToString()),
         };
 
         JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
