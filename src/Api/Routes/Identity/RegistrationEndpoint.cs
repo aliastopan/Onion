@@ -7,7 +7,8 @@ public class RegistrationEndpoint : IRouteEndpoint
     public void DefineEndpoints(WebApplication app)
     {
         app.MapPost(Uri.Identity.Register, Register)
-           .AllowAnonymous();
+           .AllowAnonymous()
+           .WithTags(Uri.Identity.Tag);
     }
 
     internal async Task<IResult> Register([FromServices] ISender sender,
