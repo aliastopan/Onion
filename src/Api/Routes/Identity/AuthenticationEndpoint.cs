@@ -1,5 +1,3 @@
-using Mapster;
-using Onion.Application.Identity.Commands.Authentication;
 using Onion.Contracts.Identity;
 
 namespace Onion.Api.Routes.Identity;
@@ -14,8 +12,7 @@ public class AuthenticationEndpoint : IRouteEndpoint
     internal async Task<IResult> Login([FromServices] ISender sender,
         LoginRequest request, HttpContext httpContext)
     {
-        var command = request.Adapt<LoginCommand>();
-        var result = await sender.Send(command);
+        var result = await sender.Send(request.AsCommand());
         return result.HttpResult(httpContext, new ProblemDetails
         {
             Title = "Login failed.",
