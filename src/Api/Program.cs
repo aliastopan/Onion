@@ -1,4 +1,5 @@
 using System.Reflection;
+using Onion.Api.Logging;
 using Onion.Api.Middleware;
 using Onion.Api.Security;
 using Onion.Application;
@@ -12,6 +13,7 @@ builder.Host.ConfigureLogging((context, logging) =>
         .ReadFrom.Configuration(context.Configuration)
         .Enrich.FromLogContext()
         .WriteTo.Console()
+        .Filter.ByExcluding(x => x.MessageTemplate.Text.Contains(LogMessages.TokenValidationFailed))
         .CreateLogger();
 
     logging.ClearProviders();
