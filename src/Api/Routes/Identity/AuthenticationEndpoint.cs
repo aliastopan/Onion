@@ -15,7 +15,16 @@ public class AuthenticationEndpoint : IRouteEndpoint
         var result = await sender.Send(request.AsCommand());
 
         return result.Match(
-            value => Results.Ok(value),
+            value =>
+            {
+                var cookieOption = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Expires = DateTime.Now.AddMonths(1)
+                };
+                httpContext.Response.Cookies.Append("jwt", value.Jwt, cookieOption);
+                return Results.Ok(value);
+            },
             error => error.AsProblem(new ProblemDetails
             {
                 Title = "Login failed.",
