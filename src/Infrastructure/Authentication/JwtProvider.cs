@@ -73,24 +73,27 @@ internal sealed class JwtProvider : IJwtService
         return refreshToken;
     }
 
-    public Result<(string jwt, string refreshToken)> Refresh(string jwt, string refreshToken)
+    public Result Refresh(ref string jwt, ref string refreshToken)
     {
         var principal = GetPrincipalFromToken(jwt);
         var validation = ValidateToken(principal, refreshToken);
         if(!validation.IsSuccess)
         {
-            return Result<(string jwt, string refreshToken)>.Inherit(result: validation);
+            return Result.Inherit(result: validation);
         }
 
-        var refreshedToken = GenerateToken(principal);
-        return Result<(string jwt, string refreshToken)>.Ok(refreshedToken);
+        RefreshToken(principal, out var refresh);
+        jwt = refresh.jwt;
+        refreshToken = refresh.refreshToken;
+        return Result.Ok();
     }
 
-    internal (string jwt, string refreshToken) GenerateToken(ClaimsPrincipal principal)
+    internal void RefreshToken(ClaimsPrincipal principal, out (string jwt, string refreshToken) refresh)
     {
         var jwt = GenerateJwt(principal, out var user);
-        var refreshToken = GenerateRefreshToken(jwt, user).Token;
-        return (jwt, refreshToken);
+        var refreshToken = GenerateRefreshToken(jwt, user);
+        refresh.jwt = jwt;
+        refresh.refreshToken = refreshToken.Token;
     }
 
     private Result ValidateToken(ClaimsPrincipal principal, string refreshToken)

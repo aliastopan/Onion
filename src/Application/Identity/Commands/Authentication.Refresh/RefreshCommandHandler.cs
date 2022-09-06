@@ -18,14 +18,16 @@ public class RefreshCommandHandler
 
     internal Result<RefreshResponse> Refresh(RefreshCommand request)
     {
-        var refresh = _jwtService.Refresh(request.Jwt, request.RefreshToken);
+        string jwt = request.Jwt;
+        string refreshToken = request.RefreshToken;
+
+        var refresh = _jwtService.Refresh(ref jwt, ref refreshToken);
         if(!refresh.IsSuccess)
         {
             return Result<RefreshResponse>.Inherit(result: refresh);
         }
 
-        (string jwt, string refreshToken) value = refresh;
-        var response = new RefreshResponse(value.jwt, value.refreshToken);
+        var response = new RefreshResponse(jwt, refreshToken);
         return Result<RefreshResponse>.Ok(response);
     }
 }
