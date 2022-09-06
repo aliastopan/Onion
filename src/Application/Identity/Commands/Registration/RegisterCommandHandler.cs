@@ -19,26 +19,27 @@ public class RegisterCommandHandler
     public Task<Result<RegisterCommandResponse>> Handle(RegisterCommand request,
         CancellationToken cancellationToken)
     {
-        Result<RegisterCommandResponse> result;
+        var result = Register(request);
+        return Task.FromResult(result);
+    }
+
+    internal Result<RegisterCommandResponse> Register(RegisterCommand request)
+    {
         var isValid = request.TryValidate(out var errors);
         if(!isValid)
         {
-            result = Result<RegisterCommandResponse>.Invalid(errors);
-            return Task.FromResult(result);
+            return Result<RegisterCommandResponse>.Invalid(errors);
         }
 
         var validation = ValidateEntry(request.Username, request.Email);
         if(!validation.IsSuccess)
         {
-            errors = validation.Errors.ToArray();
-            result = Result<RegisterCommandResponse>.Conflict(errors);
-            return Task.FromResult(result);
+            return Result<RegisterCommandResponse>.Inherit(result: validation);
         }
 
         var user = CreateUser(request.Username, request.Email, request.Password);
         var response = new RegisterCommandResponse(user);
-        result = Result<RegisterCommandResponse>.Ok(response);
-        return Task.FromResult(result);
+        return Result<RegisterCommandResponse>.Ok(response);
     }
 
     private Result ValidateEntry(string username, string email)
