@@ -13,9 +13,13 @@ public class AuthenticationEndpoint : IRouteEndpoint
         LoginRequest request, HttpContext httpContext)
     {
         var result = await sender.Send(request.AsCommand());
-        return result.HttpResult(httpContext, new ProblemDetails
-        {
-            Title = "Login failed.",
-        });
+
+        return result.Match(
+            value => Results.Ok(value),
+            error => error.AsProblem(new ProblemDetails
+            {
+                Title = "Login failed.",
+            },
+            httpContext));
     }
 }
