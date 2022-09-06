@@ -76,11 +76,6 @@ internal sealed class JwtProvider : IJwtService
     public Result<(string jwt, string refreshToken)> Refresh(string jwt, string refreshToken)
     {
         var principal = GetPrincipalFromToken(jwt);
-        if(principal is null)
-        {
-            return Result<(string jwt, string refreshToken)>.Unauthorized();
-        }
-
         var validation = ValidateToken(principal, refreshToken);
         if(!validation.IsSuccess)
         {
@@ -100,6 +95,11 @@ internal sealed class JwtProvider : IJwtService
 
     private Result ValidateToken(ClaimsPrincipal principal, string refreshToken)
     {
+        if(principal is null)
+        {
+            return Result<(string jwt, string refreshToken)>.Unauthorized();
+        }
+
         var expiry = principal.Claims.Single(x => x.Type == JwtClaimTypes.Exp).Value;
         var expiryDateUnix = long.Parse(expiry);
         var expiryDateUtc = DateTime.UnixEpoch.AddSeconds(expiryDateUnix);
