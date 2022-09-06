@@ -6,7 +6,8 @@ public class AuthenticationEndpoint : IRouteEndpoint
 {
     public void DefineEndpoints(WebApplication app)
     {
-        app.MapPost(Uri.Identity.Login, Login);
+        app.MapPost(Uri.Identity.Login, Login)
+           .AllowAnonymous();
     }
 
     internal async Task<IResult> Login([FromServices] ISender sender,

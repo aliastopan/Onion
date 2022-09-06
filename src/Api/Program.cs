@@ -1,4 +1,5 @@
 using System.Reflection;
+using Onion.Api.Security;
 using Onion.Application;
 using Onion.Infrastructure;
 
@@ -21,11 +22,16 @@ builder.Host.ConfigureServices((context, services) =>
     services.AddApplicationServices();
     services.AddInfrastructureServices(context.Configuration);
     services.AddRouteEndpoints(Assembly.GetExecutingAssembly());
+    services.AddJwtAuthentication();
+    services.AddJwtAuthorization();
 });
 
 var app = builder.Build();
 
 app.UseHttpsRedirection();
 app.UseRouteEndpoints();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.Run();
