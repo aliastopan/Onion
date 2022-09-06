@@ -5,13 +5,16 @@ public class LoginCommandHandler
 {
     private readonly IDbContext _dbContext;
     private readonly ISecureHash _secureHash;
+    private readonly IJwtService _jwtService;
 
     public LoginCommandHandler(
         IDbContext dbContext,
-        ISecureHash secureHash)
+        ISecureHash secureHash,
+        IJwtService jwtService)
     {
         _dbContext = dbContext;
         _secureHash = secureHash;
+        _jwtService = jwtService;
     }
 
     public Task<Result<LoginCommandResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
@@ -44,7 +47,8 @@ public class LoginCommandHandler
         _dbContext.Users.Update(user);
         _dbContext.Commit();
 
-        var response = new LoginCommandResponse(user);
+        var jwt = _jwtService.GenerateJwt(user);
+        var response = new LoginCommandResponse(user, jwt);
         return Result<LoginCommandResponse>.Ok(response);
     }
 

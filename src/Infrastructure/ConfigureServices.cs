@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
+using Onion.Infrastructure.Authentication;
 
 namespace Onion.Infrastructure;
 
@@ -11,6 +12,8 @@ public static class ConfigureServices
     {
         services.AddSingleton<ISecureHash, SecureHashProvider>();
         services.AddInfrastructureDbContext(configuration);
+        services.AddScoped<IJwtService, JwtProvider>();
+        services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
         return services;
     }
 
