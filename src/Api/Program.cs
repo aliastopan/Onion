@@ -1,4 +1,5 @@
 using System.Reflection;
+using Onion.Api.Middleware;
 using Onion.Api.Security;
 using Onion.Application;
 using Onion.Infrastructure;
@@ -28,6 +29,7 @@ builder.Host.ConfigureServices((context, services) =>
 
 var app = builder.Build();
 
+app.UseMiddleware<ExceptionGuard>();
 app.UseHttpsRedirection();
 app.UseRouteEndpoints();
 
