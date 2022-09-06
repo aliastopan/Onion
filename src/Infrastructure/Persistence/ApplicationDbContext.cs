@@ -12,6 +12,7 @@ internal sealed class ApplicationDbContext : DbContext, IDbContext
     { }
 
     public DbSet<User> Users => Set<User>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     public int Commit()
     {
