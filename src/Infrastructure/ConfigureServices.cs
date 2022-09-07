@@ -16,6 +16,7 @@ public static class ConfigureServices
         services.AddSingleton(JwtValidator.JwtValidationParameters(configuration));
         services.AddInfrastructureDbContext(configuration);
         services.AddScoped<IJwtService, JwtProvider>();
+        services.AddScoped<IInitializerService, InitializerProvider>();
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
         return services;
     }
