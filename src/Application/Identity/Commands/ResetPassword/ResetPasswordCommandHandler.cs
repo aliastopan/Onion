@@ -55,13 +55,13 @@ public class ResetPasswordCommandHandler
         var isValid = _secureHashService.VerifyPassword(oldPassword, salt, hashedPassword);
         if(!isValid)
         {
-            return Result.Unauthorized();
+            return Result.Unauthorized(Error.ResetPassword.IncorrectPassword);
         }
 
         var isNew = !_secureHashService.VerifyPassword(newPassword, salt, hashedPassword);
         if(!isNew)
         {
-            return Result.Error();
+            return Result.Error(Error.ResetPassword.SameOldPassword);
         }
 
         return Result.Ok();
