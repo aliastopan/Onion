@@ -8,5 +8,6 @@ public static class Uri
         public const string Register = "/api/register";
         public const string Login = "/api/login";
         public const string Refresh = "/api/auth/refresh";
+        public const string ResetPassword = "/api/auth/reset-password";
     }
 }
