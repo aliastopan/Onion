@@ -40,9 +40,18 @@ public class RegisterCommandHandler
             return Result<RegisterResponse>.Inherit(result: validation);
         }
 
-        var user = CreateUser(request.Username, request.Email, request.Password);
-        var response = new RegisterResponse(user);
+        var response = CreateUser(request.Username, request.Email, request.Password);
         return Result<RegisterResponse>.Ok(response);
+    }
+
+    private RegisterResponse CreateUser(string username, string email, string password)
+    {
+        var hash = _secureHashService.HashPassword(password, out string salt);
+        var user = new User(username, email, hash, salt, _dateTimeService.UtcNow);
+        _dbContext.Users.Add(user);
+        _dbContext.Commit();
+
+        return new RegisterResponse(user);
     }
 
     private Result ValidateEntry(string username, string email)
@@ -60,14 +69,5 @@ public class RegisterCommandHandler
         }
 
         return Result.Ok();
-    }
-
-    private User CreateUser(string username, string email, string password)
-    {
-        var hash = _secureHashService.HashPassword(password, out string salt);
-        var user = new User(username, email, hash, salt, _dateTimeService.UtcNow);
-        _dbContext.Users.Add(user);
-        _dbContext.Commit();
-        return user;
     }
 }
