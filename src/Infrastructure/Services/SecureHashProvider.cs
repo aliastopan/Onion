@@ -1,7 +1,6 @@
 using SecretSauce = CCred.Sauce;
 using System.Security.Cryptography;
 using System.Text;
-using Onion.Application.Common.Interfaces;
 
 namespace Onion.Infrastructure.Services;
 
