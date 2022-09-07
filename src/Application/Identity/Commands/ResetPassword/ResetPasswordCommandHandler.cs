@@ -1,3 +1,5 @@
+using Onion.Domain.Entities.Identity;
+
 namespace Onion.Application.Identity.Commands.ResetPassword;
 
 public class ResetPasswordCommandHandler
@@ -23,31 +25,39 @@ public class ResetPasswordCommandHandler
     internal Result<ResetPasswordResponse> ResetPassword(ResetPasswordCommand request)
     {
         var isValid = request.TryValidate(out var errors);
-        if(!isValid)
+        if (!isValid)
         {
             return Result<ResetPasswordResponse>.Invalid(errors);
         }
 
         var user = _dbContext.Users.Find(request.UserId);
-        if(user is null)
+        if (user is null)
         {
             return Result<ResetPasswordResponse>.Unauthorized();
         }
 
         var validation = ValidatePassword(request.NewPassword, request.OldPassword, user.Salt, user.HashedPassword);
-        if(!validation.IsSuccess)
+        if (!validation.IsSuccess)
         {
             return Result<ResetPasswordResponse>.Inherit(result: validation);
         }
 
-        var hash = _secureHashService.HashPassword(request.NewPassword, out var salt);
+        var response = ChangePassword(user, request.NewPassword);
+        return Result<ResetPasswordResponse>.Ok(response);
+    }
+
+    private ResetPasswordResponse ChangePassword(User user, string newPassword)
+    {
+        var hash = _secureHashService.HashPassword(newPassword, out var salt);
         user.HashedPassword = hash;
         user.Salt = salt;
         _dbContext.Users.Update(user);
-        _dbContext.Commit();
 
-        var response = new ResetPasswordResponse(user);
-        return Result<ResetPasswordResponse>.Ok(response);
+        var refreshTokens = _dbContext.RefreshTokens.Where(x => x.UserId == user.Id).ToList();
+        refreshTokens.ForEach(x => x.IsInvalidated = true);
+        _dbContext.RefreshTokens.UpdateRange(refreshTokens);
+
+        return new ResetPasswordResponse(user);
     }
 
     private Result ValidatePassword(string newPassword, string oldPassword, string salt, string hashedPassword)
