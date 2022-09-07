@@ -9,5 +9,6 @@ public static class Uri
         public const string Login = "/api/login";
         public const string Refresh = "/api/auth/refresh";
         public const string ResetPassword = "/api/auth/reset-password";
+        public const string GrantRole = "/api/auth/grant-role";
     }
 }
