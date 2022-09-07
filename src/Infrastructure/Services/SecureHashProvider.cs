@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Onion.Infrastructure.Services;
 
-internal sealed class SecureHashProvider : ISecureHash
+internal sealed class SecureHashProvider : ISecureHashService
 {
     public string HashPassword(string rawPassword, out string salt)
     {

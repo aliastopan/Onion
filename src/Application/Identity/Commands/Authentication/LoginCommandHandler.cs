@@ -4,18 +4,18 @@ public class LoginCommandHandler
     : IRequestHandler<LoginCommand, Result<LoginResponse>>
 {
     private readonly IDbContext _dbContext;
-    private readonly ISecureHash _secureHash;
+    private readonly ISecureHashService _secureHashService;
     private readonly IJwtService _jwtService;
     private readonly IDateTimeService _dateTimeService;
 
     public LoginCommandHandler(
         IDbContext dbContext,
-        ISecureHash secureHash,
+        ISecureHashService secureHashService,
         IJwtService jwtService,
         IDateTimeService dateTimeService)
     {
         _dbContext = dbContext;
-        _secureHash = secureHash;
+        _secureHashService = secureHashService;
         _jwtService = jwtService;
         _dateTimeService = dateTimeService;
     }
@@ -58,7 +58,7 @@ public class LoginCommandHandler
 
     private Result ValidatePassword(string password, string salt, string hashedPassword)
     {
-        var isValid = _secureHash.VerifyPassword(password, salt, hashedPassword);
+        var isValid = _secureHashService.VerifyPassword(password, salt, hashedPassword);
         if(!isValid)
         {
             return Result.Unauthorized(Error.Authentication.IncorrectPassword);

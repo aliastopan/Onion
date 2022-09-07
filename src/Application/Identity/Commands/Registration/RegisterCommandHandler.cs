@@ -6,16 +6,16 @@ public class RegisterCommandHandler
     : IRequestHandler<RegisterCommand, Result<RegisterResponse>>
 {
     private readonly IDbContext _dbContext;
-    private readonly ISecureHash _secureHash;
+    private readonly ISecureHashService _secureHashService;
     private readonly IDateTimeService _dateTimeService;
 
     public RegisterCommandHandler(
         IDbContext dbContext,
-        ISecureHash secureHash,
+        ISecureHashService secureHashService,
         IDateTimeService dateTimeService)
     {
         _dbContext = dbContext;
-        _secureHash = secureHash;
+        _secureHashService = secureHashService;
         _dateTimeService = dateTimeService;
     }
 
@@ -64,7 +64,7 @@ public class RegisterCommandHandler
 
     private User CreateUser(string username, string email, string password)
     {
-        var hash = _secureHash.HashPassword(password, out string salt);
+        var hash = _secureHashService.HashPassword(password, out string salt);
         var user = new User(username, email, hash, salt, _dateTimeService.UtcNow);
         _dbContext.Users.Add(user);
         _dbContext.Commit();
