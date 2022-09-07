@@ -10,6 +10,7 @@ public static class ConfigureServices
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services,
         IConfiguration configuration)
     {
+        services.AddSingleton<IDateTimeService, DateTimeProvider>();
         services.AddSingleton<ISecureHash, SecureHashProvider>();
         services.AddSingleton<JwtValidator>();
         services.AddSingleton(JwtValidator.JwtValidationParameters(configuration));

@@ -7,13 +7,16 @@ public class RegisterCommandHandler
 {
     private readonly IDbContext _dbContext;
     private readonly ISecureHash _secureHash;
+    private readonly IDateTimeService _dateTimeService;
 
     public RegisterCommandHandler(
         IDbContext dbContext,
-        ISecureHash secureHash)
+        ISecureHash secureHash,
+        IDateTimeService dateTimeService)
     {
         _dbContext = dbContext;
         _secureHash = secureHash;
+        _dateTimeService = dateTimeService;
     }
 
     public Task<Result<RegisterResponse>> Handle(RegisterCommand request,
@@ -62,7 +65,7 @@ public class RegisterCommandHandler
     private User CreateUser(string username, string email, string password)
     {
         var hash = _secureHash.HashPassword(password, out string salt);
-        var user = new User(username, email, hash, salt, DateTime.UtcNow);
+        var user = new User(username, email, hash, salt, _dateTimeService.UtcNow);
         _dbContext.Users.Add(user);
         _dbContext.Commit();
         return user;

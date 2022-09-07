@@ -13,15 +13,18 @@ internal sealed class JwtProvider : IJwtService
     private readonly JwtSettings _jwtSettings;
     private readonly JwtValidator _jwtValidator;
     private readonly IDbContext _dbContext;
+    private readonly IDateTimeService _dateTimeService;
 
     public JwtProvider(
         IOptions<JwtSettings> jwtSettings,
         JwtValidator jwtValidator,
-        IDbContext dbContext)
+        IDbContext dbContext,
+        IDateTimeService dateTimeService)
     {
         _jwtSettings = jwtSettings.Value;
         _jwtValidator = jwtValidator;
         _dbContext = dbContext;
+        _dateTimeService = dateTimeService;
     }
 
     public string GenerateJwt(User user)
@@ -41,7 +44,7 @@ internal sealed class JwtProvider : IJwtService
         var jwt = new JwtSecurityToken(
             issuer: _jwtSettings.Issuer,
             audience: _jwtSettings.Audience,
-            expires: DateTime.UtcNow.Add(_jwtSettings.TokenLifeTime),
+            expires: _dateTimeService.UtcNow.Add(_jwtSettings.TokenLifeTime),
             claims: claims,
             signingCredentials: signingCredentials);
 
@@ -64,8 +67,8 @@ internal sealed class JwtProvider : IJwtService
         {
             Token = Guid.NewGuid().ToString(),
             JwtId = jti,
-            CreationDate = DateTime.UtcNow,
-            ExpiryDate = DateTime.UtcNow.Add(_jwtSettings.RefreshLifeTime),
+            CreationDate = _dateTimeService.UtcNow,
+            ExpiryDate = _dateTimeService.UtcNow.Add(_jwtSettings.RefreshLifeTime),
             User = user
         };
         _dbContext.RefreshTokens.Add(refreshToken);
@@ -106,14 +109,14 @@ internal sealed class JwtProvider : IJwtService
         var expiry = principal.Claims.Single(x => x.Type == JwtClaimTypes.Exp).Value;
         var expiryDateUnix = long.Parse(expiry);
         var expiryDateUtc = DateTime.UnixEpoch.AddSeconds(expiryDateUnix);
-        if(expiryDateUtc > DateTime.UtcNow)
+        if(expiryDateUtc > _dateTimeService.UtcNow)
         {
             return Result.Unauthorized();
         }
 
         var token = _dbContext.RefreshTokens.SingleOrDefault(x => x.Token == refreshToken);
         if(token is null
-            || token.ExpiryDate > DateTime.UtcNow
+            || token.ExpiryDate > _dateTimeService.UtcNow
             || token.IsInvalidated
             || token.IsUsed)
         {

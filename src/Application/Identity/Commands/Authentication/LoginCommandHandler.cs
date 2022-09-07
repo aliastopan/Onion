@@ -6,15 +6,18 @@ public class LoginCommandHandler
     private readonly IDbContext _dbContext;
     private readonly ISecureHash _secureHash;
     private readonly IJwtService _jwtService;
+    private readonly IDateTimeService _dateTimeService;
 
     public LoginCommandHandler(
         IDbContext dbContext,
         ISecureHash secureHash,
-        IJwtService jwtService)
+        IJwtService jwtService,
+        IDateTimeService dateTimeService)
     {
         _dbContext = dbContext;
         _secureHash = secureHash;
         _jwtService = jwtService;
+        _dateTimeService = dateTimeService;
     }
 
     public Task<Result<LoginResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
@@ -43,7 +46,7 @@ public class LoginCommandHandler
             return Result<LoginResponse>.Inherit(result: validation);
         }
 
-        user.LastLoggedIn = DateTimeOffset.Now;
+        user.LastLoggedIn = _dateTimeService.UtcNow;
         _dbContext.Users.Update(user);
         _dbContext.Commit();
 
