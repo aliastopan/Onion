@@ -1,6 +1,5 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using Onion.Application.Common.Interfaces;
 using Onion.Domain.Entities.Identity;
 
 namespace Onion.Infrastructure.Persistence;
