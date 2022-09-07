@@ -4,7 +4,7 @@ namespace Onion.Domain.Entities.Identity;
 
 public class User
 {
-    public User(string username, string email, string hashedPassword, string salt)
+    public User(string username, string email, string hashedPassword, string salt, DateTime creationDate)
     {
         Id = Guid.NewGuid();
         Username = username;
@@ -13,8 +13,8 @@ public class User
         IsVerified = false;
         HashedPassword = hashedPassword;
         Salt = salt;
-        CreationDate = DateTimeOffset.Now;
-        LastLoggedIn = DateTimeOffset.Now;
+        CreationDate = creationDate;
+        LastLoggedIn = creationDate;
     }
 
     public Guid Id { get; set; }
@@ -24,6 +24,6 @@ public class User
     public bool IsVerified { get; set; }
     public string HashedPassword { get; set; } = null!;
     public string Salt { get; set; } = null!;
-    public DateTimeOffset CreationDate { get; set; }
-    public DateTimeOffset LastLoggedIn { get; set; }
+    public DateTime CreationDate { get; set; }
+    public DateTime LastLoggedIn { get; set; }
 }

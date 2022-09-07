@@ -62,7 +62,7 @@ public class RegisterCommandHandler
     private User CreateUser(string username, string email, string password)
     {
         var hash = _secureHash.HashPassword(password, out string salt);
-        var user = new User(username, email, hash, salt);
+        var user = new User(username, email, hash, salt, DateTime.UtcNow);
         _dbContext.Users.Add(user);
         _dbContext.Commit();
         return user;
