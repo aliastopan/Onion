@@ -4,6 +4,13 @@ namespace Onion.Domain.Entities.Identity;
 
 public class User
 {
+    public User()
+    {
+        Role = UserRole.Standard;
+        CreationDate = DateTime.UtcNow;
+        LastLoggedIn = DateTime.UtcNow;
+    }
+
     public User(string username, string email, string hashedPassword, string salt, DateTime creationDate)
     {
         Id = Guid.NewGuid();
