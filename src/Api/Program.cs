@@ -30,6 +30,7 @@ builder.Host.ConfigureServices((context, services) =>
 });
 
 var app = builder.Build();
+app.Init();
 
 app.UseMiddleware<ExceptionGuard>();
 app.UseHttpsRedirection();
