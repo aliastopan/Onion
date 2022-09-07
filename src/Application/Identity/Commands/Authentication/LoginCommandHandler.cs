@@ -1,3 +1,5 @@
+using Onion.Domain.Entities.Identity;
+
 namespace Onion.Application.Identity.Commands.Authentication;
 
 public class LoginCommandHandler
@@ -46,14 +48,19 @@ public class LoginCommandHandler
             return Result<LoginResponse>.Inherit(result: validation);
         }
 
+        var response = Auth(user);
+        return Result<LoginResponse>.Ok(response);
+    }
+
+    private LoginResponse Auth(User user)
+    {
         user.LastLoggedIn = _dateTimeService.UtcNow;
         _dbContext.Users.Update(user);
         _dbContext.Commit();
 
         var jwt = _jwtService.GenerateJwt(user);
         var refreshToken = _jwtService.GenerateRefreshToken(jwt, user);
-        var response = new LoginResponse(user, jwt, refreshToken.Token);
-        return Result<LoginResponse>.Ok(response);
+        return new LoginResponse(user, jwt, refreshToken.Token);
     }
 
     private Result ValidatePassword(string password, string salt, string hashedPassword)
