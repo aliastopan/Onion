@@ -71,8 +71,6 @@ internal sealed class JwtProvider : IJwtService
             ExpiryDate = _dateTimeService.UtcNow.Add(_jwtSettings.RefreshLifeTime),
             User = user
         };
-        _dbContext.RefreshTokens.Add(refreshToken);
-        _dbContext.Commit();
         return refreshToken;
     }
 

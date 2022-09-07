@@ -54,12 +54,14 @@ public class LoginCommandHandler
 
     private LoginResponse Auth(User user)
     {
-        user.LastLoggedIn = _dateTimeService.UtcNow;
-        _dbContext.Users.Update(user);
-        _dbContext.Commit();
-
         var jwt = _jwtService.GenerateJwt(user);
         var refreshToken = _jwtService.GenerateRefreshToken(jwt, user);
+
+        user.LastLoggedIn = _dateTimeService.UtcNow;
+        _dbContext.Users.Update(user);
+        _dbContext.RefreshTokens.Add(refreshToken);
+        _dbContext.Commit();
+
         return new LoginResponse(user, jwt, refreshToken.Token);
     }
 
